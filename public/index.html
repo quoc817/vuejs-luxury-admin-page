@@ -6,8 +6,20 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <!-- google font -->
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
   </head>
   <body>
+    <style>
+      :root {
+        --admin-primary-color: #fea100;
+        --admin-highligh-color: #fe4c8d;
+      }
+      #app {
+        font-family: 'Raleway', sans-serif;
+        font-weight: 500;
+      }
+    </style>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
