@@ -10,6 +10,7 @@
         <transition name="slide">
         <side-nav 
             v-if="showSideNav" 
+            :userRole="user.role"
             :absoluted="sideNavAbsolute"
             @closeSideNav="forceCloseSideNav($event)"
             @changeTab="getTab($event)"
@@ -18,6 +19,8 @@
         </transition>
         <main-content 
           :show="tabActiveClone"
+          :token="authToken"
+          :user="user"
           @toggleSideNav="toggleSideNav($event)"
           @forceShowSideNav="forceOpenSideNav($event)"
         >
@@ -45,9 +48,10 @@ export default {
   data: function() {
     return {
       user : {},
+      authToken: '',
       showSideNav: true,
       sideNavAbsolute: false,
-      tabActive: 'dashboard'
+      tabActive: 'product-all'
     };
   },
   methods: {
@@ -149,9 +153,13 @@ export default {
     }
   },
   created: function () {
-    this.getCookie('user') == ''
-    ? window.location.assign('/')
-    : this.user = this.getCookie('user')
+    if (this.getCookie('user') == '') {
+      window.location.assign('/')
+    }
+    else {
+      this.user = JSON.parse(this.getCookie('user'))
+      this.authToken = JSON.parse(this.getCookie('authToken'))
+    }
   }
 };
 

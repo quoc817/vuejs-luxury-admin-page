@@ -27,18 +27,18 @@
                   <td class="align-middle">{{item.price | vndFormat(item.price)}}</td>
                   <td class="align-middle">{{item.short_desc}}</td>
                   <td class="align-middle text-center">
-                    <a href="#" class="btn">
+                    <a href="#" class="btn" @click.prevent>
                       <i 
                         class="far fa-pen-alt h5" 
                         data-toggle="modal"
                         data-target="#modalUpdate"
                         :id="item._id"
-                        @click.prevent="$emit('update', $event.target.id)"
+                        @click="$emit('update', $event.target.id)"
                         ></i>
                     </a>
                   </td>
                   <td class="align-middle text-center">
-                    <a href="#" class="btn">
+                    <a href="#" class="btn" @click.prevent>
                       <i 
                         class="far fa-window-close h5" 
                         data-toggle="modal"
@@ -85,16 +85,17 @@
                   <td class="align-middle text-center">{{item.amount | vndFormat(item.amount)}}</td>
                   <td class="align-middle text-center">{{item.status | statusTrans(item.status) }}</td>
                   <td class="align-middle text-center">
-                    <a href="#" class="btn">
+                    <a href="#" class="btn" @click.prevent>
+
                       <i 
                         class="fal fa-eye h5 text-center" 
                         :id="item._id"
-                        @click.prevent="redirectViewInfo($event.target.id)"
+                        @click="redirectViewInfo($event.target.id)"
                         ></i>
                     </a>
                   </td>
                   <td class="align-middle text-center">
-                    <a href="#" class="btn">
+                    <a href="#" class="btn" @click.prevent>
                       <i 
                         class="far fa-window-close h5" 
                         data-toggle="modal"
@@ -113,6 +114,8 @@
     <view-info
       v-show="viewInfo"
       :viewId="viewId"
+      :token="token"
+      :user="user"
       @turnBack="viewInfo = false"
       @statusUpdated="applyChange($event)"
     ></view-info>
@@ -149,16 +152,16 @@
                   <td class="align-middle text-center">{{item.guest }}</td>
                   <td class="align-middle text-center">{{item.note }}</td>
                   <td class="align-middle text-center">
-                    <a href="#" class="btn">
+                    <a href="#" class="btn" @click.prevent>
                       <i 
                         class="fal fa-pen-alt h5 text-center" 
                         data-toggle="modal"
                         data-target="#modalUpdate"
                         :id="item._id"
-                        @click.prevent="$emit('update', $event.target.id)"
+                        @click="$emit('update', $event.target.id)"
                         ></i>
                     </a>
-                    <a href="#" class="btn">
+                    <a href="#" class="btn" @click.prevent>
                       <i 
                         class="far fa-window-close h5" 
                         data-toggle="modal"
@@ -208,28 +211,28 @@
                   <td class="align-middle text-center d-flex align-items-center justify-content-center"
                   >
                      <p>********</p>
-                    <a href="#" class="btn ml-3">
+                    <a href="#" class="btn ml-3" v-if="user.role == 'admin'" @click.prevent >
                       <i 
                         :class="['fal h5', 'fa-eye'] " 
                         :id="item._id"
-                        @click.stop.prevent="toggleViewPass($event.target)"
+                        @click="toggleViewPass($event.target)"
                         ></i>
                     </a>
                   </td>
                   <td class="align-middle text-center">{{ item.role}}</td>
                   <td class="align-middle text-center">
-                    <a href="#" class="btn">
+                    <a href="#" class="btn" @click.prevent>
                       <i 
                         class="fal fa-pen-alt h5 text-center" 
                         data-toggle="modal"
                         data-target="#modalUpdate"
                         :id="item._id"
-                        @click.prevent="$emit('update' , $event.target.id)"
+                        @click="$emit('update' , $event.target.id)"
                         ></i>
                     </a>
                   </td>
                   <td class="align-middle text-center">
-                    <a href="#" class="btn">
+                    <a href="#" class="btn" @click.prevent>
                       <i 
                         class="far fa-window-close h5" 
                         data-toggle="modal"
@@ -338,11 +341,13 @@ export default {
   props: {
     show: String,
     data: Array,
-    searchQueries: String
+    searchQueries: String,
+    token: String,
+    user: Object
   },
   components: {
      Pagination,
-     ViewInfo
+     ViewInfo,
   },
   data: function () {
     return {
@@ -350,6 +355,8 @@ export default {
       activePage: 1,      // page active on pagnation
       numPerPage: 10,     // number per one page
       dataClone: [],      // data to show in table
+
+       host: HOST,        // define host
 
       viewInfo: false,    // --order : toggle view details of one item
       viewId: '',      // --order : detect id of view item
@@ -365,24 +372,31 @@ export default {
   },
   methods: {
     addNewUser: async function () {
+      //define header request
       let res = await fetch(HOST +'/'+ this.show, {
         method: 'POST', 
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': this.token
         },
         body: JSON.stringify(this.newUser)
       }) 
       if (res.ok) {
-        this.$emit('createdUser');
-        this.dataClone.push(Object.assign({},this.newUser));
-        // reset and close input group
-        let reset = {          //--user : new user object
-                      username: '',
-                      password: '',
-                      role: 'staff'
-                    }
-        Object.assign(this.newUser, reset);
-        this.openFormAdd = false;
+        if(res.status == '201') {
+          this.$emit('createdUser');
+          this.dataClone.push(Object.assign({},this.newUser));
+          // reset and close input group
+          let reset = {          //--user : new user object
+                        username: '',
+                        password: '',
+                        role: 'staff'
+                      }
+          Object.assign(this.newUser, reset);
+          this.openFormAdd = false;
+        }
+        if(res.status == '403') {
+          this.userNameHelpText = 'Tài khoản đã tồn tại';
+        }
       } else {
         this.$emit('fail');
       }
@@ -397,7 +411,7 @@ export default {
     filterByName: function (inputVal) {
       var vm = this;
       let filtered = Array.prototype.filter.call(this.data, function (item) {
-        console.log('filter' +vm.findAnyMatchValue(item, inputVal));
+        // console.log('filter' +vm.findAnyMatchValue(item, inputVal));
         return vm.findAnyMatchValue(item, inputVal);
       })
       // apply after filter

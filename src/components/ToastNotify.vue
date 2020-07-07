@@ -37,8 +37,8 @@ export default {
 }
 .toast.fade.hide {
   position: absolute; 
-  top: 0; 
-  right: 0; 
+  top: 72px; 
+  right: 27px; 
   z-index: -1;
 }
 

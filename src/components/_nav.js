@@ -1,14 +1,14 @@
 export default {
     _name: 'SideNav',
     _children: [
-       {
-        _name: 'sideNavItem',
-        name: 'Dashboard',
-        to: '/dashboard',
-        badge: {
-            text: 'NEW'
-        }
-       },
+    //    {
+    //     _name: 'sideNavItem',
+    //     name: 'Dashboard',
+    //     to: '/dashboard',
+    //     badge: {
+    //         text: 'NEW'
+    //     }
+    //    },
        {
         _name: 'sideNavDropdrown',
         name: 'Sản Phẩm',

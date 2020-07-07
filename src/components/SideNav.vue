@@ -7,6 +7,7 @@
             </i>
             <nav-link 
               v-for="(item, index) in menu._children" :key="index" 
+              :userRole="userRole"
               :type="item._name"
               :to="'#'"
               :text="item.name"
@@ -40,7 +41,8 @@ import * as menuLink from '../components/_nav'
 
 export default {
     props: {
-      absoluted: Boolean
+      absoluted: Boolean,
+      userRole: String
     },
     components: {
       NavLink,

@@ -123,7 +123,9 @@ import { HOST } from "../helper/helper";
 export default {
   name: "ViewInfo",
   props: {
-    viewId: String
+    viewId: String,
+    token: String,
+    user: Object
   },
   data: function() {
     return {
@@ -160,7 +162,7 @@ export default {
   methods: {
     getFulldetail: async function() {
       try {
-        let res = await fetch(HOST + "/order/" + this.viewId);
+        let res = await fetch(HOST + "/order/" + this.viewId, {headers: {'Authorization': this.token}});
         // console.log(res)
         if (res.status != 200) {
           throw new Error("Fetching err" + res.status);
@@ -205,8 +207,9 @@ export default {
         let res = await fetch(HOST + "/order/" + this.viewId, {
           method: "PATCH",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
             // 'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': this.token
           },
           body: JSON.stringify({
             status: this.status

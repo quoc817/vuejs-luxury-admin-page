@@ -102,7 +102,7 @@
                     name="date"
                     type="date" class="form-control" 
                     v-model="itemClone.date"
-                    @click="changed = true"
+                    @change="changed = true"
                         />
             </div>
             <div class="form-group">
@@ -137,7 +137,7 @@
                 <select 
                     :class="['form-control', bookingStatusStyle]" 
                     id="confirm"
-                    
+                    @change="changed = true"
                     >
                     <option value="1" :selected="itemClone.confirm == 'no' ? 'selected' : ''">Chưa xác nhận</option>
                     <option value="0" :selected="itemClone.confirm == 'yes' ? 'selected' : ''">Đã xác nhận</option>
@@ -221,7 +221,7 @@ export default {
   },
   data: function () {
     return {
-       allType: {
+       allType: {                   //-- product
         first:
         {
             name: 'Bữa Sáng',
@@ -261,7 +261,9 @@ export default {
        fileUploadName: 'Tải lên',
        uploadSrc: '',
        changed: false,
+
        host: HOST,
+
        newUser: {          //--user : new user object
         username: '',
         password: '',
@@ -319,7 +321,7 @@ export default {
         this.fileUploadName ='Tải lên';
     },
     toggleType: function (target) {
-        // target.checked = true/ false -> match into checklist
+        // target.checked = true/ false -> match into checkedlist
        this.checkedList[target.value].hasOwn = target.checked;
        this.changed = true;
     },
@@ -327,10 +329,11 @@ export default {
         const tagUpdated = [];
         for(let key in this.checkedList) {
             if(this.checkedList[key].hasOwn == true) {
-                Array.prototype.push.call(tagUpdated, key);
+                tagUpdated.push(key)
             }
         }
         this.itemClone.tag = tagUpdated.join(',');
+        console.log(this.itemClone)
         this.itemClone.img = this.imgPrevSrc != '' ? this.imgPrevSrc :  this.imgOriginSrc;
 
         // turn back data to parent component

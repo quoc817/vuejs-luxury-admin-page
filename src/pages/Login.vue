@@ -16,6 +16,7 @@
             id="username"
             name="username"
             v-model="username"
+            @focus="loginError = ''"
           />
           <small id="emailHelp" class="form-text text-danger" v-if="nameError">{{ nameError }}</small>
         </div>
@@ -28,6 +29,7 @@
             id="password"
             name="password"
             v-model="password"
+            @focus="loginError = ''"
           />
           <small id="passwordHelp" class="form-text text-danger" v-if="passError">{{ passError }}</small>
         </div>
@@ -52,7 +54,7 @@
 
 <script>
 import Header from "../components/Header";
-import $ from 'jquery'
+
 import {HOST} from '../helper/helper'
 export default {
   name: "Login",
@@ -76,29 +78,31 @@ export default {
       // check login
       if (!this.nameError && !this.passError) {
         // call api
-        const vm = this;
-        $.ajax({
-          type: "POST",
-          url: HOST + '/user/auth',
-          headers: {'Content-Type': 'application/json'},
-          data: JSON.stringify({username: this.username, password: this.password}),
-          dataType: "json",
-          success: function (response) {
-            if (response.auth == true) {
-              // has access
-              vm.hasAccess = true;
-              //  create cookie
-              vm.setCookie("user", response.result.username, 1000);
-              this.location.assign('/dashboard')
-            }
+        fetch( HOST + '/user/auth', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-          statusCode: {
-            404: function () {
-              vm.loginError = "Tên đăng nhập / mật khẩu không đúng !!!";
+          body: JSON.stringify({username: this.username, password: this.password})
+        })
+          .then( res => {
+            if(res.status == 200) {
+              this.setCookie("authToken", JSON.stringify(res.headers.get('Authorization')), 1440 );
+              res.json()
+               .then(result => {
+                  if(result.auth == true) {
+                    // has access
+                    this.hasAccess = true;
+                    //  create cookie <name : tring>,<expires : .x.minutes>
+                    this.setCookie("user", JSON.stringify(result.user), 1440 );
+                  }
+                })
             }
-          }
-        });
-        
+            if(res.status == 404) {
+              this.loginError = 'Tên đăng nhập / Mật khẩu sai !'
+            }
+          })
+         
       }
     },
     setCookie: function(cname, cvalue, exmins) {

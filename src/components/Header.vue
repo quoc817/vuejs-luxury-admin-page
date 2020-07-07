@@ -5,8 +5,12 @@
                 <img src="../assets/logo-page.png" alt="">
             </a>
         </li>
-        <li v-if="userInfo" class="nav-item row row-cols-2 align-items-center justify-content-center col-4 col-lg-3 ml-auto no-gutters">
-            <a class="nav-link text-right" href="#">Hi, {{user}} </a>
+        <li v-if="userInfo" class="nav-item row align-items-center justify-content-center col-4 ml-auto no-gutters">
+            <a class="nav-link text-right h4" href="#">
+                <i class="fas fa-clipboard-user mr-2 h2"></i>
+               <span class="text-admin-primary" >Hi</span>, {{user.username}} 
+            </a>
+            
             <a href="#" class="btn btn-dark" @click='logout()'>
                 Đăng xuất
                 <i class="fad fa-sign-out">
@@ -44,8 +48,8 @@ export default {
             return true;
         },
         logout: function () {
-            console.log('were are here')
             document.cookie = `user = ; 01 Jan 1970 00:00:00 UTC ; path = /`;
+            document.cookie = `authToken = ; 01 Jan 1970 00:00:00 UTC ; path = /`;
             window.location.assign('/');
         },
     },
@@ -67,5 +71,11 @@ export default {
     .img-thumb {
         width: 32px;
         height: 32px;
+    }
+    .text-admin-primary {
+        color: var(--admin-primary-color)
+    }
+    .btn.btn-dark {
+        flex-basis: 30%;
     }
 </style>

@@ -22,6 +22,8 @@
         :show="show"
         :data="dataTableClone"
         :searchQueries="searchQueries"
+        :token="token"
+        :user="user"
         @update="setId($event)"
         @delete="setId($event)"
         @orderUpdate="showNotify('Đã cập nhật trạng thái đơn hàng!')"
@@ -29,7 +31,8 @@
         @fail="showNotify('Tạo user thất bại')"
       ></table-content>
       <form-create
-        v-show="createForm"
+        v-show="createForm && user.role == 'admin'"
+        :token="token"
         @created="showNotify('Đã thêm sản phẩm')"
       >
 
@@ -65,7 +68,9 @@ import FormCreate from "./FormCreate";
 export default {
   name: "MainContent",
   props: {
-    show: String
+    show: String,
+    token: String,
+    user: Object
   },
   components: {
     SearchBox,
@@ -91,16 +96,18 @@ export default {
       // reset data
       this.dataTable.splice(0);
       this.route = '';
-      this.components = '';
+      this.component = '';
+      this.createForm = false;
       // get view
+      console.log('reseted')
       this.controlView();
     },
-    toastMessage: function() {
-      
+    toastMessage: function() {  
     }
   },
   methods: {
     controlView: function() {
+      console.log(this.route + '-' +this.component + '-' + this.createForm)
       switch(this.show) {
         case 'product-all' : {
           this.route = '/dish';
@@ -139,23 +146,30 @@ export default {
       if(this.route) {
         this.createForm = false;
         this.fetchData(this.route);
+      
       }
-      else if (this.component == 'AddDish') {
+      if (this.component == 'AddDish') {
         this.createForm = true;
-      }
+        console.log(this.component + '-' + this.createForm)
+      } 
+      
     },
     fetchData: async function (route) {
       try {
-          let res = await fetch(HOST + route);
+          //define header request
+          let header = new Headers();
+          header.append('Authorization', this.token);
+          
+          let res = await fetch(HOST + route, {headers: header});
           // console.log(res)
           if(res.status != 200 ) {
-            throw new Error('Fetching err' + res.status)
+            throw new Error('Fetching error ' + res.status);
           } else {
             let result = await res.json();
             this.dataTable = result.result;
           }
         } catch (error) {
-          console.log(error);
+          console.log(error.message);
         }
     },
     changeQueries: function (inputVal) {
@@ -165,28 +179,45 @@ export default {
       this.objectSelectedId = id;
     },
     productApplyData: async function (itemUpdate) {
+      // data to send
+      let updateFrom = document.getElementById('updateProduct');
+      let formData = new FormData(updateFrom);
+      formData.append('tag', itemUpdate.tag);
+      formData.delete('productType');
+      
+      // compair item update & item oringin
+      let pos = Array.prototype.findIndex.call(this.dataTable, el => el._id == itemUpdate._id );  
+      let originItem = this.dataTable[pos];
+      for(let key in itemUpdate) {
+        if(itemUpdate[key] == originItem[key]) {
+          // delete field no nescessary update
+          formData.delete(key);
+        }
+      }
+
       // call update api on backend
       // here
-      let updateFrom = document.getElementById('updateProduct')
-      let formData = new FormData(updateFrom);
-      formData.append('tags', itemUpdate.tag);
+      
       const res = await fetch(HOST + this.route + '/' + itemUpdate._id, {
         method: 'PUT',
+        headers: {
+          'Authorization': this.token
+        },
         body: formData 
       });
 
       if(res.status == 201) {
-        // update success 
-        // apply on local data
-        const pos = Array.prototype.findIndex.call(this.dataTable, el => el._id == itemUpdate._id );  
-        if (pos > -1) {
-          this.$set(this.dataTable, pos, itemUpdate);
-        }
         // show toast 
         this.showNotify('Cập nhật thành công')
-      } else {
+        // apply on local data
+        this.$set(this.dataTable, pos, itemUpdate);
+        let result = await res.json()
+        console.log(result)
+      } 
+      else {
         this.showNotify('Cập nhật thất bại')
       }
+      
     },
     bookingApplyData: async function (itemUpdate) {
       // call update api on backend
@@ -194,7 +225,8 @@ export default {
       const res = await fetch(HOST + this.route + '/' + itemUpdate._id, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': this.token
         },
         body: JSON.stringify(itemUpdate) 
       });
@@ -216,6 +248,9 @@ export default {
       // call delete api on backend
       // here
       const res = await fetch(HOST + this.route + '/'+ itemDelete._id, {
+        headers: {
+          'Authorization': this.token
+        },
         method: 'DELETE',
       });
 
@@ -257,10 +292,12 @@ export default {
     userApplyData: async function (itemUpdate) {
        // call update api on backend
       // here
+      console.log(this.token)
       const res = await fetch(HOST + this.route + '/' + itemUpdate._id, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': this.token
         },
         body: JSON.stringify(itemUpdate) 
       });
@@ -306,6 +343,11 @@ export default {
         return 'user';
       }
       return '';
+    }
+  },
+  created: function () {
+    if ( this.show == 'product-all' ) {
+      this.controlView() 
     }
   }
 };

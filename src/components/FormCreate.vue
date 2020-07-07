@@ -71,7 +71,9 @@ import { HOST } from "../helper/helper";
 
 export default {
   name: "FormCreate",
-  props: {},
+  props: {
+    token: String
+  },
   data: function() {
     return {
       allType: {
@@ -150,11 +152,11 @@ export default {
 			let form = document.getElementById('createForm')
 			let data = new FormData(form);
 			data.append('tags', this.tagChecked.join(','))
-			fetch('http://localhost:3003/dish', {
+			fetch( HOST + '/dish', {
 				method: 'POST',
-				// headers: {
-				// 	"Content-Type": 'multipart/form-data'
-				// },
+				headers: {
+					"Authorization": this.token
+				},
 				body: data
 			})
 			.then(res => {
