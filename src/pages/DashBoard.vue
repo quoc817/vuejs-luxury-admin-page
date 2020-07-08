@@ -75,7 +75,7 @@ export default {
 			return "";
     },
     getTab : function (path) {
-      console.log(path);
+      // console.log(path);
       switch(path) {
         case '/dashboard': {
           this.tabActiveClone =  'dashboard';

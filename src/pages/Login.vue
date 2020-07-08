@@ -44,6 +44,7 @@
         <button
           @click.prevent="login()"
           @keyup.enter="login()"
+          :disabled="!isValid"
           type="submit"
           class="btn btn-lg col-xs-10 col-md-3 login-submit"
         >Đăng Nhập</button>
@@ -76,7 +77,7 @@ export default {
   methods: {
     login: function() {
       // check login
-      if (!this.nameError && !this.passError) {
+      if (!!this.username && !!this.password && this.isValid) {
         // call api
         fetch( HOST + '/user/auth', {
           method: 'POST',
@@ -129,7 +130,7 @@ export default {
   },
   computed: {
     nameError: function() {
-      let userRegEx = new RegExp("^[a-z0-9A-Z]{5,}$");
+      let userRegEx = new RegExp("^[a-z0-9A-Z]{6,}$");
       if (this.username) {
         if (!userRegEx.test(this.username)) {
           return "Tên đăng nhập không hợp lệ !";
@@ -145,7 +146,11 @@ export default {
         }
       }
       return "";
+    },
+    isValid: function () {
+      return !this.nameError && !this.passError ? true : false;
     }
+    
   },
   watch: {
     hasAccess: function() {

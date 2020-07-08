@@ -5,7 +5,7 @@
                 <img src="../assets/logo-page.png" alt="">
             </a>
         </li>
-        <li v-if="userInfo" class="nav-item row align-items-center justify-content-center col-4 ml-auto no-gutters">
+        <li v-if="userInfo" class="nav-item row align-items-center justify-content-center col-6 col-lg-4 ml-auto no-gutters">
             <a class="nav-link text-right h4" href="#">
                 <i class="fas fa-clipboard-user mr-2 h2"></i>
                <span class="text-admin-primary" >Hi</span>, {{user.username}} 

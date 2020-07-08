@@ -93,13 +93,12 @@ export default {
   },
   watch: {
     show: function () {
-      // reset data
+      // reset data -> clean view
       this.dataTable.splice(0);
       this.route = '';
       this.component = '';
       this.createForm = false;
       // get view
-      console.log('reseted')
       this.controlView();
     },
     toastMessage: function() {  
@@ -107,7 +106,6 @@ export default {
   },
   methods: {
     controlView: function() {
-      console.log(this.route + '-' +this.component + '-' + this.createForm)
       switch(this.show) {
         case 'product-all' : {
           this.route = '/dish';
@@ -150,7 +148,6 @@ export default {
       }
       if (this.component == 'AddDish') {
         this.createForm = true;
-        console.log(this.component + '-' + this.createForm)
       } 
       
     },
@@ -211,8 +208,6 @@ export default {
         this.showNotify('Cập nhật thành công')
         // apply on local data
         this.$set(this.dataTable, pos, itemUpdate);
-        let result = await res.json()
-        console.log(result)
       } 
       else {
         this.showNotify('Cập nhật thất bại')
@@ -262,7 +257,12 @@ export default {
           this.dataTable.splice(pos, 1);
         }
         // show toast 
+       if( itemDelete.name) {
         this.showNotify('Đã xóa' + itemDelete.name);
+       }
+       if( itemDelete.username) {
+        this.showNotify('Đã xóa' + itemDelete.username);
+       }
       } else {
         this.showNotify('Xóa thất bại')
       }
@@ -274,25 +274,19 @@ export default {
       this.toastMessage = message;
       $('#toastNotify').toast({autohide: true, delay: 3000});
       $('#toastNotify').toast('show');
-      // $('#toastNotify').on('show.bs.toast' , function () {
-      //   console.log('before show')
-      //   console.log($('#toastNotify').parent())
-      //   $('#toastNotify').parent().removeClass("onhide");
-      //   $('#toastNotify').parent().addClass("onshow");
-      //   console.log($('#toastNotify').parent())
-      // })
-      // $('#toastNotify').on('hide.bs.toast' , function () {
-      //    console.log('before hide')
-      //   console.log($('#toastNotify').parent())
-      //   $('#toastNotify').parent().removeClass("onshow");
-      //   $('#toastNotify').parent().addClass("onhide");
-      //    console.log($('#toastNotify').parent())
-      // })
+      $('#toastNotify').on('shown.bs.toast' , function () {
+        $('#toastParent').removeClass("onhide");
+        $('#toastParent').addClass("onshow");
+      })
+      $('#toastNotify').on('hide.bs.toast' , function () {
+        $('#toastParent').removeClass("onshow");
+        $('#toastParent').addClass("onhide");
+         
+      })
     },
     userApplyData: async function (itemUpdate) {
        // call update api on backend
       // here
-      console.log(this.token)
       const res = await fetch(HOST + this.route + '/' + itemUpdate._id, {
         method: 'PATCH',
         headers: {
@@ -349,6 +343,7 @@ export default {
     if ( this.show == 'product-all' ) {
       this.controlView() 
     }
+    this.showNotify();
   }
 };
 </script>

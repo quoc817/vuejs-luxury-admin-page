@@ -1,7 +1,7 @@
 <template>
 
    <!-- Position it -->
-  <!-- <div class="onhide"> -->
+    <div id="toastParent" class="onhide" aria-live="polite" aria-atomic="true">
     <!-- Then put toasts within -->
     <div id="toastNotify" class="toast fade hide" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header">
@@ -14,6 +14,7 @@
       <div class="toast-body h4">
         <slot>notify</slot>  <i class="fad fa-check text-success"> </i>
       </div>
+    </div>
     </div>
 <!-- </div> -->
 
@@ -29,13 +30,13 @@ export default {
 </script>
 
 <style scoped>
-.toast.fade.show {
+.onshow {
   position: fixed; 
   top: 72px; 
   right: 27px; 
   z-index: 1000;
 }
-.toast.fade.hide {
+.onhide {
   position: absolute; 
   top: 72px; 
   right: 27px; 

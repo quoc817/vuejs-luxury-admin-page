@@ -333,7 +333,6 @@ export default {
             }
         }
         this.itemClone.tag = tagUpdated.join(',');
-        console.log(this.itemClone)
         this.itemClone.img = this.imgPrevSrc != '' ? this.imgPrevSrc :  this.imgOriginSrc;
 
         // turn back data to parent component
