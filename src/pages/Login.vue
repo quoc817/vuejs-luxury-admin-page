@@ -69,8 +69,8 @@ export default {
     return {
       hasAccess: false,
       currentRoute: window.location.pathname,
-      username: "",
-      password: "",
+      username: "userdemo",
+      password: "userdemo",
       loginError: ""
     };
   },
