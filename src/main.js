@@ -30,7 +30,7 @@ new Vue({
     }
   },
   render: function(h) {
-    // console.log(this.viewPage);
+    console.log(this.viewPage);
     return h(this.viewPage);
   },
 }).$mount('#app')
