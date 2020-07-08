@@ -25,12 +25,12 @@ new Vue({
             page = route.views;
           }
       })
-      // console.log(page)
+      console.log(page)
       return page ? require(`./pages/${page}`).default : require(`./pages/404`).default;
     }
   },
   render: function(h) {
-    console.log(this.viewPage);
+    // console.log(this.viewPage);
     return h(this.viewPage);
   },
 }).$mount('#app')
