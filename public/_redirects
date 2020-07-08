@@ -1,3 +1,2 @@
 # Netlify settings for single-page application
-/login    /login   200
-/dashboard    /dashboard   200
+/*    /index.html   200
